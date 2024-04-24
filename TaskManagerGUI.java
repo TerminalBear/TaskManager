@@ -53,6 +53,8 @@ public class TaskManagerGUI {
         sortByPriorityButton = new JButton("Sort by Priority");
         addTaskButton = new JButton("Add Task");
         removeTaskButton = new JButton("Remove Task");
+        JButton searchButton = new JButton("Search");
+        topPanel.add(searchButton);
         topPanel.add(searchField);
         topPanel.add(sortByNameButton);
         topPanel.add(sortByDateButton);
@@ -114,6 +116,7 @@ public class TaskManagerGUI {
     }
 
     // Methods of the TaskManagerGUI class
+    
     public void addTask() {
         tableModel.addRow(new Object[] { "", "", new Date(), "", "INCOMPLETE", "", "" });
     }

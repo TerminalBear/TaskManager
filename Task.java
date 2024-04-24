@@ -1,11 +1,21 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class Task {
     public enum Status {
         INCOMPLETE, IN_PROGRESS, COMPLETE
     }
+// Comparator for sorting tasks by priority
+public static Comparator<Task> PRIORITY_COMPARATOR = (t1, t2) -> Integer.compare(t1.getUserSetPriority(), t2.getUserSetPriority());
+
+// Comparator for sorting tasks by due date
+public static Comparator<Task> DUE_DATE_COMPARATOR = (t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate());
+
+// Comparator for sorting tasks by name
+public static Comparator<Task> NAME_COMPARATOR = (t1, t2) -> t1.getName().compareTo(t2.getName());
 
     // Properties of the Task class
     private String name;
