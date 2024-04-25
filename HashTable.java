@@ -3,12 +3,12 @@ import java.util.LinkedList;
 public class HashTable {
     private LinkedList<Task>[] table;
     private int size;
-    private float loadFactor;
+    private double loadFactor;
     private int entries = 0;
     private int currSize = 0;
 
     @SuppressWarnings("unchecked")
-    public HashTable(int size, float loadFactor) {
+    public HashTable(int size, double loadFactor) {
         this.size = size;
         this.loadFactor = loadFactor;
         table = new LinkedList[size];
@@ -86,7 +86,27 @@ private int hash(int priority) {
                 entries++;
             }
         }
-}}
+}
+public int size() {
+    return size;
+}
+
+public void add(Task task) {
+    // Add the task to the hash table
+    // Increment the size
+    size++;
+}
+
+
+    public Object[] keySet() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'keySet'");
+    }
+    public Task[] values() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'values'");
+    }
+}
 // potential change using an array.
 /*private Task[] table;
 

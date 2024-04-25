@@ -61,7 +61,9 @@ public static Comparator<Task> NAME_COMPARATOR = (t1, t2) -> t1.getName().compar
     public LocalDate getDueDate() {
         return this.dueDate;
     }
-
+    public Task.Status getStatus() {
+        return this.status;
+    }
     public void setName(String name) {
         this.name = name;
     }
