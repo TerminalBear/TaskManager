@@ -23,13 +23,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-
+import javax.swing.JOptionPane;
 public class TaskManagerGUI {
     // Properties of the TaskManagerGUI class
     private JLabel resultLabel;
 
     private JFrame frame;
     private JTextField searchField;
+    private JTextField addField;
     private JButton sortByNameButton;
     private JButton sortByDateButton;
     private JButton sortByPriorityButton;
@@ -39,13 +40,16 @@ public class TaskManagerGUI {
     private DefaultTableModel tableModel;
     private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
     private DecisionTree predictor;
-    private HashTable hashTable; // Declare the hashTable variable
+    private HashTable hashTable; 
+    private TaskSearcher taskSearcher;// Declare the hashTable variable
     public TaskManagerGUI() {
         // Create the GUI
         hashTable = new HashTable(10, 0.75);
-
+    
+        taskSearcher = new TaskSearcher(hashTable);
         // Create a search field and a result label
         searchField = new JTextField(10);
+       addField = new JTextField(10);
         resultLabel = new JLabel();
         frame = new JFrame("Task Manager");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,7 +66,7 @@ public class TaskManagerGUI {
         addTaskButton = new JButton("Add Task");
         removeTaskButton = new JButton("Remove Task");
         JButton searchButton = new JButton("Search");
-        topPanel.add(searchButton);
+       
         topPanel.add(searchField);
         topPanel.add(sortByNameButton);
         topPanel.add(sortByDateButton);
@@ -72,8 +76,10 @@ public class TaskManagerGUI {
         // Create a JPanel to hold the search button and result label
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(searchField);
+       topPanel.add(addField);
         bottomPanel.add(resultLabel);
-
+        bottomPanel.add(searchButton);
+        bottomPanel.setBackground(Color.DARK_GRAY);
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(bottomPanel,BorderLayout.SOUTH);
 
@@ -99,14 +105,19 @@ public class TaskManagerGUI {
         removeTaskButton.addActionListener(e -> removeTask());
         searchButton.addActionListener(e -> {
             String taskName = searchField.getText();
-            Task task = searchTask(taskName);
-            if (task != null) {
-                for (int i = 0; i < tableModel.getRowCount(); i++) {
-                    if (task.equals(tableModel.getValueAt(i, 0))) {
-                        tableModel.removeRow(i);
+           
+                Task task = searchTask(taskName);
+                if (task!= null) {
+                    for (int i = 0; i < tableModel.getRowCount(); i++) {
+                        if (task.equals(tableModel.getValueAt(i, 0))) {
+                            tableModel.removeRow(i);
+                        }
                     }
                 }
-            }
+                else {
+                    resultLabel.setText("Not found");
+                }
+           
         });
         // Set the status column to use a JComboBox
         String[] statuses = { "INCOMPLETE", "IN_PROGRESS", "COMPLETE" };
@@ -127,7 +138,7 @@ public class TaskManagerGUI {
 
         taskTable.getColumnModel().getColumn(6).setCellRenderer(new PredictButtonRenderer());
         taskTable.getColumnModel().getColumn(6).setCellEditor(new PredictButtonEditor(new JTextField()));
-
+        searchField.setText("No input");
         // GUI styling
         frame.getContentPane().setBackground(Color.LIGHT_GRAY);
         topPanel.setBackground(Color.DARK_GRAY);
@@ -140,12 +151,7 @@ public class TaskManagerGUI {
     }
 
     // Methods of the TaskManagerGUI class
-    public void searchTask() {
-        int[] selectedRows = taskTable.getSelectedRows();
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            tableModel.removeRow(selectedRows[i]);
-        }
-    }
+  
     // Add the searchTask method to the TaskManagerGUI class
 
       public Task searchTask(String taskName) {
@@ -160,7 +166,20 @@ public class TaskManagerGUI {
     }
     
     public void addTask() {
-        tableModel.addRow(new Object[] { "", "", new Date(), "", "INCOMPLETE", "", "" });
+        // Get the name, description, creation date, and due date from the user
+        String name = JOptionPane.showInputDialog("Enter the name of the task:");
+        String description = JOptionPane.showInputDialog("Enter the description of the task:");
+        LocalDate creationDate = LocalDate.now();
+        LocalDate dueDate = LocalDate.now();
+
+        // Create a new Task object with the name, description, creation date, and due date
+        Task task = new Task(name, description, creationDate, dueDate);
+
+        // Add the task to the hash table
+        hashTable.add(task);
+
+        // Add the task to the table model
+        tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
     }
 
     public void removeTask() {

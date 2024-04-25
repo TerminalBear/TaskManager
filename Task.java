@@ -36,6 +36,7 @@ public static Comparator<Task> NAME_COMPARATOR = (t1, t2) -> t1.getName().compar
         this.creationTime = creationTime;
         this.dueDate = dueDate;
     }
+    
 
     // Getter and Setters for the properties
     public String getName() {
