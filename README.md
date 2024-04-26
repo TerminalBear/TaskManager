@@ -8,6 +8,8 @@ The addTask method adds a new row to the table with default values. The removeTa
 The DateRenderer class is a custom cell renderer for displaying dates in the "Creation Date" and "Due Date" columns.<br>
 The PredictButtonRenderer and PredictButtonEditor classes are custom cell renderer and editor for the "Predict" button in the "Suggested Priority" column. When the button is clicked, it uses a DecisionTree predictor to predict the priority of the task and updates the cell value.<br>
 The DateEditor class is a custom cell editor for editing dates in the "Due Date" column.<br>
+There is a class for priority visualization using a bar graph when Task and Priority button is clicked.<br>
+There is a feedback button for "Inaccurate Prediction" which acknowledges and adjusts decision tree weights.<br>
 The main method creates an instance of the TaskManagerGUI class, which launches the application.<br>
 <br>
 Task.java<br>
@@ -29,7 +31,7 @@ DecisionTree.java<br>
 root: The root node of the decision tree.<br>
 DecisionTree(): The constructor of the class. It initializes the decision tree with a specific structure and conditions.<br>
 predictPriority(Task task): This method traverses the decision tree based on the task's data and returns the predicted priority. It starts from the root and goes down the tree until it reaches a node with a priority (a leaf node).<br>
-evaluateCondition(String condition, Task task): This private method evaluates a condition based on the task's data. It checks if the condition contains "daysBetween" or "descriptionLength" and evaluates the condition accordingly.
+evaluateCondition(String condition, Task task): This private method evaluates a condition based on the task's data. It checks if the condition contains "daysBetween" or "descriptionLength" and evaluates the condition accordingly. There is an adjust method for altering the weights when feedback is provided.
 <br>
 HashTable.java<br>
 table: An array of LinkedLists. Each LinkedList represents a bucket in the hash table.<br>
@@ -53,7 +55,6 @@ Next steps:<br>
 •	Add submit button that takes table information and builds hastable using HashTable.java<br>
 •	Develop Kruskal’s Algorithm and Boyer-Moore’s Algorithm<br>
 •	Add algorithm functionality to Sort and Search Bar buttons<br>
-•	Develop a class for priority visualization using a graph representation and add button to GUI<br>
 •	Feedback loop that will reset parameters in DecisionTree.java<br>
 •	Test<br>
 •	Documentation<br>
