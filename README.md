@@ -55,7 +55,6 @@ Next steps:<br>
 •	Add submit button that takes table information and builds hastable using HashTable.java<br>
 •	Develop Kruskal’s Algorithm and Boyer-Moore’s Algorithm<br>
 •	Add algorithm functionality to Sort and Search Bar buttons<br>
-•	Feedback loop that will reset parameters in DecisionTree.java<br>
 •	Test<br>
 •	Documentation<br>
 
