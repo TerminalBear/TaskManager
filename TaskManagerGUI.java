@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,10 +10,14 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,6 +37,8 @@ public class TaskManagerGUI {
     private JButton sortByPriorityButton;
     private JButton addTaskButton;
     private JButton removeTaskButton;
+    private JButton listTaskButton;
+    private JButton feedbackButton;
     private JTable taskTable;
     private DefaultTableModel tableModel;
     private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -53,12 +60,76 @@ public class TaskManagerGUI {
         sortByPriorityButton = new JButton("Sort by Priority");
         addTaskButton = new JButton("Add Task");
         removeTaskButton = new JButton("Remove Task");
+        listTaskButton = new JButton("Task and Priority");
+        feedbackButton = new JButton("Inaccurate Prediction");
+
         topPanel.add(searchField);
         topPanel.add(sortByNameButton);
         topPanel.add(sortByDateButton);
         topPanel.add(sortByPriorityButton);
         topPanel.add(addTaskButton);
         topPanel.add(removeTaskButton);
+        topPanel.add(listTaskButton);
+
+        feedbackButton.addActionListener(e -> {
+            // Get the selected row
+            int selectedRow = taskTable.getSelectedRow();
+            if (selectedRow != -1) {
+                // Get the task and the predicted priority from the selected row
+                Task task = (Task) tableModel.getValueAt(selectedRow, 0);
+                int predictedPriority = (int) tableModel.getValueAt(selectedRow, 6);
+
+                // Adjust the decision tree
+                predictor.adjust(task, predictedPriority);
+            }
+            JOptionPane.showMessageDialog(null, "Feedback Accepted", "Information", JOptionPane.INFORMATION_MESSAGE);
+        });
+        topPanel.add(feedbackButton);
+
+        listTaskButton.addActionListener(e -> {
+            // new JFrame
+            JFrame outputFrame = new JFrame("Task Details");
+            outputFrame.setSize(600, 600); // Increase the height of the frame
+            outputFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            // JPanel with a BoxLayout
+            JPanel innerPanel = new JPanel();
+            innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
+
+            // Iterate over all rows in the table
+            for (int row = 0; row < tableModel.getRowCount(); row++) {
+                // Get the task name and priority from the row
+                String taskName = (String) tableModel.getValueAt(row, 0);
+                String taskPriority = (String) tableModel.getValueAt(row, 5);
+
+                // bar graph
+                int priority = Integer.parseInt(taskPriority.split(" ")[0]); // Extract the priority number
+                JPanel bar = new JPanel();
+                bar.setBackground(Color.BLUE);
+                bar.setPreferredSize(new Dimension(20, priority * priority * 20)); // Set the height of the bar
+                                                                                   // proportional to the square of the
+                                                                                   // priority
+
+                JLabel label = new JLabel("Task: " + taskName + ", Priority: " + taskPriority);
+
+                // panel for the bar and label, and add them to it
+                JPanel barPanel = new JPanel();
+                barPanel.setLayout(new BoxLayout(barPanel, BoxLayout.Y_AXIS));
+                barPanel.add(Box.createVerticalGlue()); // Add an empty Box component with a flexible vertical size
+                barPanel.add(bar); // Add the bar
+                barPanel.add(label); // Add the label
+
+                // Add the barPanel to the innerPanel
+                innerPanel.add(barPanel);
+            }
+
+            // Add the innerPanel to the JFrame
+            outputFrame.add(innerPanel);
+
+            // Make the JFrame visible
+            outputFrame.setVisible(true);
+        });
+
         panel.add(topPanel, BorderLayout.NORTH);
 
         predictor = new DecisionTree();
@@ -206,7 +277,7 @@ public class TaskManagerGUI {
     }
 
     public static void main(String[] args) {
-        // Create an instance of the TaskManagerGUI class
+        // n instance of the TaskManagerGUI class
         new TaskManagerGUI();
     }
 }

@@ -1,6 +1,7 @@
 import java.time.temporal.ChronoUnit;
 
 public class DecisionTree {
+    private double threshold = 0.5;
     private Node root;
 
     public DecisionTree() {
@@ -27,6 +28,22 @@ public class DecisionTree {
             }
         }
         return currentNode.getPriority() != null ? currentNode.getPriority() : -1;
+    }
+
+    public void adjust(Task task, int predictedPriority) {
+        // This is a simplified example and the actual implementation would be more
+        // complex
+        if (predictedPriority == 1) {
+            // If the predicted priority was too high, lower the threshold
+            threshold -= 0.1;
+        } else if (predictedPriority == 5) {
+            // If the predicted priority was too low, increase the threshold
+            threshold += 0.1;
+        }
+    }
+
+    public double getThreshold() {
+        return threshold;
     }
 
     private boolean evaluateCondition(String condition, Task task) {
