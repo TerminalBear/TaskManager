@@ -6,8 +6,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+
 import javax.swing.JLabel;
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
@@ -36,6 +43,7 @@ public class TaskManagerGUI {
     private JButton sortByPriorityButton;
     private JButton addTaskButton;
     private JButton removeTaskButton;
+    private JButton sortByDueDateButton;
     private JTable taskTable;
     private DefaultTableModel tableModel;
     private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -65,6 +73,7 @@ public class TaskManagerGUI {
         sortByPriorityButton = new JButton("Sort by Priority");
         addTaskButton = new JButton("Add Task");
         removeTaskButton = new JButton("Remove Task");
+        sortByDueDateButton = new JButton("sort by due date");
         JButton searchButton = new JButton("Search");
        
         topPanel.add(searchField);
@@ -73,12 +82,14 @@ public class TaskManagerGUI {
         topPanel.add(sortByPriorityButton);
         topPanel.add(addTaskButton);
         topPanel.add(removeTaskButton);
+       
         // Create a JPanel to hold the search button and result label
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(searchField);
        topPanel.add(addField);
         bottomPanel.add(resultLabel);
         bottomPanel.add(searchButton);
+        bottomPanel.add(sortByDueDateButton);
         bottomPanel.setBackground(Color.DARK_GRAY);
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(bottomPanel,BorderLayout.SOUTH);
@@ -118,6 +129,22 @@ public class TaskManagerGUI {
                     resultLabel.setText("Not found");
                 }
            
+        });
+        sortByDueDateButton.addActionListener(e -> {
+            Object[] taskSet = hashTable.keySet();
+            List<Task> taskList = new ArrayList<Task>();
+            Collections.sort(taskList, new Comparator<Task>() {
+                @Override
+                public int compare(Task t1, Task t2) {
+                    try {
+                        Date d1 = formatter.parse(t1.getDueDate(), null);
+                        Date d2 = formatter.parse(t2.getDueDate());
+                        return d1.compareTo(d2);
+                    } catch (ParseException e) {
+                        return 0;
+                    }
+                }
+            });
         });
         // Set the status column to use a JComboBox
         String[] statuses = { "INCOMPLETE", "IN_PROGRESS", "COMPLETE" };

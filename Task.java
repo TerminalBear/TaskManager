@@ -59,8 +59,9 @@ public static Comparator<Task> NAME_COMPARATOR = (t1, t2) -> t1.getName().compar
         return this.creationTime;
     }
 
-    public LocalDate getDueDate() {
-        return this.dueDate;
+    public String getDueDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    return dueDate.format(formatter);
     }
     public Task.Status getStatus() {
         return this.status;
