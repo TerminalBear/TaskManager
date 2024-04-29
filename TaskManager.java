@@ -6,6 +6,7 @@ public class TaskManager {
         this.tasks = tasks;
         this.hashTable = new HashTable(10, 0.75);
         convertArrayToHashTable();
+        
     }
 
     private void convertArrayToHashTable() {

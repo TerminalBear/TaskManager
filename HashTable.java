@@ -1,4 +1,6 @@
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class HashTable {
     private LinkedList<Task>[] table;
@@ -15,6 +17,19 @@ public class HashTable {
         for (int i = 0; i < size; i++) {
             table[i] = new LinkedList<>();
         }
+    }
+    
+    public Task[] values() {
+        Task[] values = new Task[size];
+        int index = 0;
+        for (int i = 0; i < table.length; i++) {
+            if (table[i]!= null) {
+                for (Task task : table[i]) {
+                    values[index++] = task;
+                }
+            }
+        }
+        return values;
     }
 //altered the hash function to distributly more uniformly 
 private int hash(int priority) {
@@ -98,14 +113,18 @@ public void add(Task task) {
 }
 
 
-    public Object[] keySet() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'keySet'");
+public Set<Task> keySet() {
+    Set<Task> keys = new HashSet<>();
+    for (int i = 0; i < table.length; i++) {
+        if (table[i]!= null) {
+            for (Task task : table[i]) {
+                keys.add(task);
+            }
+        }
     }
-    public Task[] values() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'values'");
-    }
+    return keys;
+}
+  
 }
 // potential change using an array.
 /*private Task[] table;

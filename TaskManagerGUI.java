@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
-
+import java.util.TreeSet;
 import javax.swing.JLabel;
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
@@ -32,6 +32,18 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.JOptionPane;
 public class TaskManagerGUI {
+    private TreeSet<Task> sortedTasks = new TreeSet<>(new Comparator<Task>() {
+        @Override
+        public int compare(Task t1, Task t2) {
+            try {
+                Date d1 = formatter.parse(t1.getDueDate());
+                Date d2 = formatter.parse(t2.getDueDate());
+                return d1.compareTo(d2);
+            } catch (ParseException e) {
+                return 0;
+            }
+        }
+    });
     // Properties of the TaskManagerGUI class
     private JLabel resultLabel;
 
@@ -131,20 +143,13 @@ public class TaskManagerGUI {
            
         });
         sortByDueDateButton.addActionListener(e -> {
-            Object[] taskSet = hashTable.keySet();
-            List<Task> taskList = new ArrayList<Task>();
-            Collections.sort(taskList, new Comparator<Task>() {
-                @Override
-                public int compare(Task t1, Task t2) {
-                    try {
-                        Date d1 = formatter.parse(t1.getDueDate(), null);
-                        Date d2 = formatter.parse(t2.getDueDate());
-                        return d1.compareTo(d2);
-                    } catch (ParseException e) {
-                        return 0;
-                    }
-                }
-            });
+            // Clear the table model
+           // tableModel.setRowCount(0);
+        
+            // Add the sorted tasks from the TreeSet to the table model
+            for (Task task : sortedTasks) {
+                tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+            }
         });
         // Set the status column to use a JComboBox
         String[] statuses = { "INCOMPLETE", "IN_PROGRESS", "COMPLETE" };
@@ -191,20 +196,22 @@ public class TaskManagerGUI {
         // Return the task if found, or null if not found
         return task;
     }
-    
     public void addTask() {
         // Get the name, description, creation date, and due date from the user
         String name = JOptionPane.showInputDialog("Enter the name of the task:");
         String description = JOptionPane.showInputDialog("Enter the description of the task:");
         LocalDate creationDate = LocalDate.now();
         LocalDate dueDate = LocalDate.now();
-
+    
         // Create a new Task object with the name, description, creation date, and due date
         Task task = new Task(name, description, creationDate, dueDate);
-
+    
         // Add the task to the hash table
         hashTable.add(task);
-
+    
+        // Add the task to the TreeSet
+        sortedTasks.add(task);
+    
         // Add the task to the table model
         tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
     }
