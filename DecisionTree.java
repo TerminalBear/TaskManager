@@ -47,9 +47,6 @@ public class DecisionTree {
     }
 
     private boolean evaluateCondition(String condition, Task task) {
-        // evaluate the condition based on the task's data
-        // this is a simplified example and the actual implementation would be more
-        // complex
         if (condition.contains("daysBetween")) {
             long daysBetween = ChronoUnit.DAYS.between(task.getCreationDate(), task.getDueDate());
             if (condition.contains("< 1")) {
