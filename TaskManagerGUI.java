@@ -36,8 +36,8 @@ public class TaskManagerGUI {
         @Override
         public int compare(Task t1, Task t2) {
             try {
-                Date d1 = formatter.parse(t1.getDueDate());
-                Date d2 = formatter.parse(t2.getDueDate());
+                Date d1 = formatter.parse(t2.getDueDate());
+                Date d2 = formatter.parse(t1.getDueDate());
                 return d1.compareTo(d2);
             } catch (ParseException e) {
                 return 0;
@@ -65,7 +65,8 @@ public class TaskManagerGUI {
     public TaskManagerGUI() {
         // Create the GUI
         hashTable = new HashTable(10, 0.75);
-    
+     Task[] tasks = new Task[] { new Task("Task 1", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)), new Task("Task 2", "Description for Task 2", LocalDate.now(), LocalDate.now().plusDays(3)), new Task("Task 3", "Description for Task 3", LocalDate.now(), LocalDate.now().plusDays(7)), new Task("Task 4", "Description for Task 4", LocalDate.now(), LocalDate.now().plusDays(10)), new Task("Task 5", "Description for Task 5", LocalDate.now(), LocalDate.now().plusDays(2)), new Task("Task 6", "Description for Task 6", LocalDate.now(), LocalDate.now().plusDays(8)), new Task("Task 7", "Description for Task 7", LocalDate.now(), LocalDate.now().plusDays(12)), new Task("Task 8", "Description for Task 8", LocalDate.now(), LocalDate.now().plusDays(4)), new Task("Task 9", "Description for Task 9", LocalDate.now(), LocalDate.now().plusDays(6)), new Task("Task 10", "Description for Task 10", LocalDate.now(), LocalDate.now().plusDays(9)) };
+    TaskManager taskManager = new TaskManager(tasks);
         taskSearcher = new TaskSearcher(hashTable);
         // Create a search field and a result label
         searchField = new JTextField(10);
@@ -87,20 +88,23 @@ public class TaskManagerGUI {
         removeTaskButton = new JButton("Remove Task");
         sortByDueDateButton = new JButton("sort by due date");
         JButton searchButton = new JButton("Search");
-       
+        JButton TasklistButton = new JButton("Populate");
+        
+        JButton boyerMooreButton = new JButton("Boyer-Moore Search"); // Add a new button for Boyer-Moore search
         topPanel.add(searchField);
         topPanel.add(sortByNameButton);
         topPanel.add(sortByDateButton);
         topPanel.add(sortByPriorityButton);
         topPanel.add(addTaskButton);
         topPanel.add(removeTaskButton);
-       
+        topPanel.add(boyerMooreButton); // Add the new button to the top panel
         // Create a JPanel to hold the search button and result label
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(searchField);
        topPanel.add(addField);
         bottomPanel.add(resultLabel);
         bottomPanel.add(searchButton);
+        bottomPanel.add(TasklistButton);
         bottomPanel.add(sortByDueDateButton);
         bottomPanel.setBackground(Color.DARK_GRAY);
         panel.add(topPanel, BorderLayout.NORTH);
@@ -116,6 +120,7 @@ public class TaskManagerGUI {
                 return true;
             }
         };
+    
         taskTable = new JTable(tableModel);
         taskTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(taskTable);
@@ -124,6 +129,26 @@ public class TaskManagerGUI {
         frame.add(panel);
         frame.setVisible(true);
        
+        boyerMooreButton.addActionListener(e -> {
+            String query = searchField.getText();
+            List<Task> results = taskManager.searchTasks(query);
+        
+            if (!results.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (Task task : results) {
+                    sb.append("Name: ").append(task.getName()!= null? task.getName() : "Empty").append("\n");
+                    sb.append("Description: ").append(task.getDescription()!= null? task.getDescription() : "Empty").append("\n");
+                    sb.append("Creation Date: ").append(task.getCreationDate()!= null? task.getCreationDate().toString() : "Empty").append("\n");
+                    sb.append("Due Date: ").append(task.getDueDate()!= null? task.getDueDate().toString() : "Empty").append("\n");
+                    sb.append("Status: ").append(task.getStatus()!= null? task.getStatus() : "Empty").append("\n");
+                    sb.append("\n");
+                }
+                JOptionPane.showMessageDialog(frame, sb.toString(), "Search Results", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "No results found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        TasklistButton.addActionListener(e -> addTasklist());
         addTaskButton.addActionListener(e -> addTask());
         removeTaskButton.addActionListener(e -> removeTask());
         searchButton.addActionListener(e -> {
@@ -142,6 +167,7 @@ public class TaskManagerGUI {
                 }
            
         });
+     
         sortByDueDateButton.addActionListener(e -> {
             // Clear the table model
            // tableModel.setRowCount(0);
@@ -185,7 +211,31 @@ public class TaskManagerGUI {
     // Methods of the TaskManagerGUI class
   
     // Add the searchTask method to the TaskManagerGUI class
+    public  void addTasklist() {
+        Task[] tasks = { new Task("Task 1", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)),
+        new Task("Task 2", "Description for Task 2", LocalDate.now(), LocalDate.now().plusDays(3)),
+        new Task("Task 3", "Description for Task 3", LocalDate.now(), LocalDate.now().plusDays(7)),
+        new Task("Task 4", "Description for Task 4", LocalDate.now(), LocalDate.now().plusDays(10)),
+        new Task("Task 5", "Description for Task 5", LocalDate.now(), LocalDate.now().plusDays(2)),
+        new Task("Task 6", "Description for Task 6", LocalDate.now(), LocalDate.now().plusDays(8)),
+        new Task("Task 7", "Description for Task 7", LocalDate.now(), LocalDate.now().plusDays(12)),
+        new Task("Task 8", "Description for Task 8", LocalDate.now(), LocalDate.now().plusDays(4)),
+        new Task("Task 9", "Description for Task 9", LocalDate.now(), LocalDate.now().plusDays(6)),
+        new Task("Task 10", "Description for Task 10", LocalDate.now(), LocalDate.now().plusDays(9)) };
 
+// Add each task to the hash table and the sorted tasks list
+for (Task task : tasks) {
+    hashTable.add(task);
+    sortedTasks.add(task);
+}
+
+// Add each task to the table model
+for (Task task : tasks) {
+    tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+}
+// Add tasks 11-20
+
+    }
       public Task searchTask(String taskName) {
         // Create a new instance of the TaskSearcher class
         TaskSearcher taskSearcher = new TaskSearcher(hashTable);
@@ -201,10 +251,17 @@ public class TaskManagerGUI {
         String name = JOptionPane.showInputDialog("Enter the name of the task:");
         String description = JOptionPane.showInputDialog("Enter the description of the task:");
         LocalDate creationDate = LocalDate.now();
-        LocalDate dueDate = LocalDate.now();
+        String dueDateInput = JOptionPane.showInputDialog("Enter the due date (MM/dd/yyyy):");
+        Date dueDate = null;
+        try {
+            dueDate = formatter.parse(dueDateInput);
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(null, "Invalid due date format. Please use MM/dd/yyyy.");
+            return;
+        }
     
         // Create a new Task object with the name, description, creation date, and due date
-        Task task = new Task(name, description, creationDate, dueDate);
+        Task task = new Task(name, description, creationDate, dueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
     
         // Add the task to the hash table
         hashTable.add(task);
@@ -213,7 +270,13 @@ public class TaskManagerGUI {
         sortedTasks.add(task);
     
         // Add the task to the table model
+        TaskManager.addTask(null, task);
         tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+        if (task == null) {
+            System.out.println("Task is null");
+        } else {
+            System.out.println("Task is not null");
+        }
     }
 
     public void removeTask() {
@@ -222,7 +285,7 @@ public class TaskManagerGUI {
             tableModel.removeRow(selectedRows[i]);
         }
     }
-
+  
     // Custom renderer for date columns
     class DateRenderer extends DefaultTableCellRenderer {
         @Override
@@ -305,6 +368,7 @@ public class TaskManagerGUI {
 
     public static void main(String[] args) {
         // Create an instance of the TaskManagerGUI class
+        
         new TaskManagerGUI();
     }
 }
