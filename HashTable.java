@@ -85,7 +85,7 @@ private int hash(int priority) {
     
 
     @SuppressWarnings("unchecked")
-    //resize function altered to 
+
     private void resize() {
         size = size * 2;
         LinkedList<Task>[] oldTable = table;
@@ -126,82 +126,3 @@ public Set<Task> keySet() {
 }
   
 }
-// potential change using an array.
-/*private Task[] table;
-
-public HashTable(int size, float loadFactor) {
-    this.size = size;
-    this.loadFactor = loadFactor;
-    table = new Task[size];
-    for (int i = 0; i < size; i++) {
-        table[i] = null;
-    }
-}
-
-private int hash(int priority) {
-    return priority % size;
-}
-
-public void put(Task task) {
-    if (entries >= size * loadFactor) {
-        resize();
-    }
-    int index = hash(task.getUserSetPriority());
-    if (table[index] == null) {
-        table[index] = new Task[1];
-    }
-    table[index][0] = task;
-    entries++;
-    this.currSize++;
-}
-
-public Task get(int priority) {
-    int index = hash(priority);
-    if (table[index] == null) {
-        return null;
-    }
-    return table[index][0];
-}
-
-public boolean remove(Task task) {
-    int index = hash(task.getUserSetPriority());
-    if (table[index] == null) {
-        return false;
-    }
-    table[index] = null;
-    this.currSize--;
-    return true;
-}
-
-public boolean contains(Task task) {
-    int index = hash(task.getUserSetPriority());
-    if (table[index] == null) {
-        return false;
-    }
-    return table[index][0].equals(task);
-}
-
-public boolean updatePriority(Task task, int newPriority) {
-    if (remove(task)) {
-        task.setUserSetPriority(newPriority);
-        put(task);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-private void resize() {
-    size = size * 2;
-    Task[] oldTable = table;
-    table = new Task[size];
-    for (int i = 0; i < size; i++) {
-        table[i] = null;
-    }
-    entries = 0;
-    for (Task task : oldTable) {
-        if (task!= null) {
-            put(task);
-        }
-    }
-} */
