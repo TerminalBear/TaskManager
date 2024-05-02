@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class TaskManagerGUI {
     private JButton removeTaskButton;
     private JButton listTaskButton;
     private JButton feedbackButton;
+    private JButton SortByDueDate;
     private JTable taskTable;
     private DefaultTableModel tableModel;
     private SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -48,9 +50,13 @@ public class TaskManagerGUI {
     private TaskSearcher taskSearcher;
     private HashTable hashTable; 
     private JLabel resultLabel;
+    private TaskManager taskManger;
+
 
     public TaskManagerGUI() {
         // Create the GUI
+       
+        predictor = new DecisionTree();
         hashTable = new HashTable(10, 0.75);
         Task[] tasks = new Task[] { new Task("Task 1", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)), new Task("Task 2", "Description for Task 2", LocalDate.now(), LocalDate.now().plusDays(3)), new Task("Task 3", "Description for Task 3", LocalDate.now(), LocalDate.now().plusDays(7)), new Task("Task 4", "Description for Task 4", LocalDate.now(), LocalDate.now().plusDays(10)), new Task("Task 5", "Description for Task 5", LocalDate.now(), LocalDate.now().plusDays(2)), new Task("Task 6", "Description for Task 6", LocalDate.now(), LocalDate.now().plusDays(8)), new Task("Task 7", "Description for Task 7", LocalDate.now(), LocalDate.now().plusDays(12)), new Task("Task 8", "Description for Task 8", LocalDate.now(), LocalDate.now().plusDays(4)), new Task("Task 9", "Description for Task 9", LocalDate.now(), LocalDate.now().plusDays(6)), new Task("Task 10", "Description for Task 10", LocalDate.now(), LocalDate.now().plusDays(9)) };
         TaskManager taskManager = new TaskManager(tasks);
@@ -64,6 +70,7 @@ public class TaskManagerGUI {
         JPanel topPanel = new JPanel();
         topPanel.setBackground(Color.DARK_GRAY);
         searchField = new JTextField(20);
+        SortByDueDate = new JButton("Sort by Due Date ");
         sortByNameButton = new JButton("Sort by Name");
         sortByDateButton = new JButton("Sort by Date");
         sortByPriorityButton = new JButton("Sort by Priority");
@@ -83,6 +90,8 @@ public class TaskManagerGUI {
         topPanel.add(addTaskButton);
         topPanel.add(removeTaskButton);
         topPanel.add(listTaskButton);
+    
+        bottomPanel.add(SortByDueDate);
         bottomPanel.add(boyerMooreButton);
         bottomPanel.add(searchField);
         bottomPanel.add(resultLabel);
@@ -105,6 +114,8 @@ public class TaskManagerGUI {
             JOptionPane.showMessageDialog(null, "Feedback Accepted", "Information", JOptionPane.INFORMATION_MESSAGE);
         });
         topPanel.add(feedbackButton);
+       SortByDueDate.addActionListener(e -> sortByDueDate());
+
         boyerMooreButton.addActionListener(e -> {
             String query = searchField.getText();
             List<Task> results = taskManager.searchTasks(query);
@@ -124,6 +135,7 @@ public class TaskManagerGUI {
                 JOptionPane.showMessageDialog(frame, "No results found.", "Search Results", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+        sortByNameButton.addActionListener(e -> sortTasksByName());
         listTaskButton.addActionListener(e -> {
             // new JFrame
             JFrame outputFrame = new JFrame("Task Details");
@@ -187,7 +199,7 @@ public class TaskManagerGUI {
 
         frame.add(panel);
         frame.setVisible(true);
-
+        sortByDateButton.addActionListener(e -> sortTasksByDate());
         addTaskButton.addActionListener(e -> addTask());
         removeTaskButton.addActionListener(e -> removeTask());
 
@@ -223,7 +235,152 @@ public class TaskManagerGUI {
        
     }
   
-        
+    public void sortTasksByName() {
+        // Get the tasks from the table model
+        int rowCount = tableModel.getRowCount();
+        Task[] tasks = new Task[rowCount];
+        for (int i = 0; i < rowCount; i++) {
+            tasks[i] = new Task((String) tableModel.getValueAt(i, 0), (String) tableModel.getValueAt(i, 1), LocalDate.now(), (LocalDate) tableModel.getValueAt(i, 3));
+        }
+    
+        // Sort the tasks using Quick Sort
+        quickSort(tasks, 0, tasks.length - 1);
+    
+        // Update the table model with the sorted tasks
+        tableModel.setRowCount(0);
+        for (Task task : tasks) {
+            tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+        }
+    }
+    public void sortTasksByDate() {
+        int rowCount = tableModel.getRowCount();
+        Task[] tasks = new Task[rowCount];
+        for (int i = 0; i < rowCount; i++) {
+            String name = (String) tableModel.getValueAt(i, 0);
+            String description = (String) tableModel.getValueAt(i, 1);
+            String creationDateString = (String) tableModel.getValueAt(i, 2);
+            String dueDateString = (String) tableModel.getValueAt(i, 3);
+            LocalDate creationDate = LocalDate.parse(creationDateString);
+            LocalDate dueDate = LocalDate.parse(dueDateString);
+            tasks[i] = new Task(name, description, creationDate, dueDate);
+        }
+    
+        // Sort the tasks using Merge Sort
+        mergeSort(tasks, 0, tasks.length - 1);
+    
+        // Update the table model with the sorted tasks
+        tableModel.setRowCount(0);
+        for (Task task : tasks) {
+            tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+        }
+    }
+    
+    private void mergeSort(Task[] tasks, int left, int right) {
+        if (left < right) {
+            int mid = (left + right) / 2;
+            mergeSort(tasks, left, mid);
+            mergeSort(tasks, mid + 1, right);
+            merge(tasks, left, mid, right);
+        }
+    }
+    
+    private void merge(Task[] tasks, int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+    
+        Task[] L = new Task[n1];
+        Task[] R = new Task[n2];
+    
+        for (int i = 0; i < n1; i++) {
+            L[i] = tasks[left + i];
+        }
+        for (int j = 0; j < n2; j++) {
+            R[j] = tasks[mid + 1 + j];
+        }
+    
+        int i = 0;
+        int j = 0;
+        int k = left;
+    
+        while (i < n1 && j < n2) {
+            if (L[i].getCreationDate().compareTo(R[j].getCreationDate()) <= 0) {
+                tasks[k] = L[i];
+                i++;
+            } else {
+                tasks[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+    
+        while (i < n1) {
+            tasks[k] = L[i];
+            i++;
+            k++;
+        }
+    
+        while (j < n2) {
+            tasks[k] = R[j];
+            j++;
+            k++;
+        }
+    }
+    public void sortByDueDate() {
+        int rowCount = tableModel.getRowCount();
+        Task[] tasks = new Task[rowCount];
+        for (int i = 0; i < rowCount; i++) {
+            tasks[i] = new Task((String) tableModel.getValueAt(i, 0), (String) tableModel.getValueAt(i, 1), LocalDate.now(), (LocalDate) tableModel.getValueAt(i, 3));
+        }
+    
+        // Sort the tasks using Bubble Sort
+        bubbleSort(tasks);
+    
+        // Update the table model with the sorted tasks
+        tableModel.setRowCount(0);
+        for (Task task : tasks) {
+            tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+        }
+    }
+    
+    private void bubbleSort(Task[] tasks) {
+        int n = tasks.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (tasks[j].getDueDate().compareTo(tasks[j + 1].getDueDate()) > 0) {
+                    // Swap tasks[j] and tasks[j + 1]
+                    Task temp = tasks[j];
+                    tasks[j] = tasks[j + 1];
+                    tasks[j + 1] = temp;
+                }
+            }
+        }
+    }
+    private void quickSort(Task[] tasks, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(tasks, low, high);
+            quickSort(tasks, low, pivotIndex - 1);
+            quickSort(tasks, pivotIndex + 1, high);
+        }
+    }
+
+    private int partition(Task[] tasks, int low, int high) {
+        Task pivot = tasks[high];
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (tasks[j].getName().compareTo(pivot.getName()) < 0) {
+                i++;
+                swap(tasks, i, j);
+            }
+        }
+        swap(tasks, i + 1, high);
+        return i + 1;
+    }
+
+    private void swap(Task[] tasks, int i, int j) {
+        Task temp = tasks[i];
+        tasks[i] = tasks[j];
+        tasks[j] = temp;
+    }
     // Methods of the TaskManagerGUI class
     public void addTask() {
         // Get the name, description, creation date, and due date from the user
@@ -246,10 +403,10 @@ public class TaskManagerGUI {
         hashTable.add(task);
     
         // Add the task to the TreeSet
-        //sortedTasks.add(task);
+
     
         // Add the task to the table model
-        TaskManager.addTask(null, task);
+       // TaskManager.addTask(null, task);
         tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
         if (task == null) {
             System.out.println("Task is null");

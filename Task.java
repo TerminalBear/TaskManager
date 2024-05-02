@@ -22,11 +22,14 @@ public class Task {
     public Task.Status getStatus() {
         return this.status;
     }
+    
     public Task(String name, String description, LocalDate creationTime, LocalDate dueDate) {
+        
         this.name = name;
         this.description = description;
         this.creationTime = creationTime;
         this.dueDate = dueDate;
+        this.userSetPriority = 3; // default priority is medium
     }
 
     // Getter and Setters for the properties
@@ -96,6 +99,7 @@ public class Task {
                 ", creationTime='" + creationTime + '\'' +
                 ", status='" + status + '\'' +
                 '}';
+                
     }
 
     public static void main(String[] args) {
