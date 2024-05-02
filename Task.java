@@ -19,7 +19,9 @@ public class Task {
     public Task() {
         this.creationTime = LocalDate.now();
     }
-
+    public Task.Status getStatus() {
+        return this.status;
+    }
     public Task(String name, String description, LocalDate creationTime, LocalDate dueDate) {
         this.name = name;
         this.description = description;

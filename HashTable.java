@@ -1,14 +1,16 @@
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class HashTable {
     private LinkedList<Task>[] table;
     private int size;
-    private float loadFactor;
+    private double loadFactor;
     private int entries = 0;
     private int currSize = 0;
 
     @SuppressWarnings("unchecked")
-    public HashTable(int size, float loadFactor) {
+    public HashTable(int size, double loadFactor) {
         this.size = size;
         this.loadFactor = loadFactor;
         table = new LinkedList[size];
@@ -16,11 +18,28 @@ public class HashTable {
             table[i] = new LinkedList<>();
         }
     }
-
-    private int hash(int priority) {
-        return priority % size;
+    
+    public Task[] values() {
+        Task[] values = new Task[size];
+        int index = 0;
+        for (int i = 0; i < table.length; i++) {
+            if (table[i]!= null) {
+                for (Task task : table[i]) {
+                    values[index++] = task;
+                }
+            }
+        }
+        return values;
     }
-
+//altered the hash function to distributly more uniformly 
+private int hash(int priority) {
+    int hash = 0;
+    hash += priority;
+    hash += (priority >> 10) ^ 0x12345678;
+    hash += (priority >> 20) ^ 0x87654321;
+    hash += (priority >> 30) ^ 0x55555555;
+    return Math.abs(hash % size);
+}
     public int currSize() {
         return this.currSize;
     }
@@ -63,8 +82,10 @@ public class HashTable {
             return false;
         }
     }
+    
 
     @SuppressWarnings("unchecked")
+
     private void resize() {
         size = size * 2;
         LinkedList<Task>[] oldTable = table;
@@ -75,8 +96,33 @@ public class HashTable {
         entries = 0;
         for (LinkedList<Task> bucket : oldTable) {
             for (Task task : bucket) {
-                put(task);
+                int index = hash(task.getUserSetPriority());
+                table[index].add(task);
+                entries++;
+            }
+        }
+}
+public int size() {
+    return size;
+}
+
+public void add(Task task) {
+    // Add the task to the hash table
+    // Increment the size
+    size++;
+}
+
+
+public Set<Task> keySet() {
+    Set<Task> keys = new HashSet<>();
+    for (int i = 0; i < table.length; i++) {
+        if (table[i]!= null) {
+            for (Task task : table[i]) {
+                keys.add(task);
             }
         }
     }
+    return keys;
+}
+  
 }
