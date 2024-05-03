@@ -58,7 +58,7 @@ public class TaskManagerGUI {
        
         predictor = new DecisionTree();
         hashTable = new HashTable(10, 0.75);
-        Task[] tasks = new Task[] { new Task("Task 1", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)), new Task("Task 2", "Description for Task 2", LocalDate.now(), LocalDate.now().plusDays(3)), new Task("Task 3", "Description for Task 3", LocalDate.now(), LocalDate.now().plusDays(7)), new Task("Task 4", "Description for Task 4", LocalDate.now(), LocalDate.now().plusDays(10)), new Task("Task 5", "Description for Task 5", LocalDate.now(), LocalDate.now().plusDays(2)), new Task("Task 6", "Description for Task 6", LocalDate.now(), LocalDate.now().plusDays(8)), new Task("Task 7", "Description for Task 7", LocalDate.now(), LocalDate.now().plusDays(12)), new Task("Task 8", "Description for Task 8", LocalDate.now(), LocalDate.now().plusDays(4)), new Task("Task 9", "Description for Task 9", LocalDate.now(), LocalDate.now().plusDays(6)), new Task("Task 10", "Description for Task 10", LocalDate.now(), LocalDate.now().plusDays(9)) };
+        Task[] tasks = new Task[] { new Task("Development", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)), new Task("Research", "Description for Task 2", LocalDate.now().minusDays(7), LocalDate.now().plusDays(3)), new Task("Draft", "Description for Task 3",  LocalDate.now().minusDays(4), LocalDate.now().plusDays(7)), new Task("Proposal", "Description for Task 4", LocalDate.now().minusDays(10), LocalDate.now().plusDays(10)), new Task("Final`", "Description for Task 5",  LocalDate.now().minusDays(1), LocalDate.now().plusDays(2)), new Task("Walk", "Description for Task 6", LocalDate.now().minusDays(12), LocalDate.now().plusDays(8)), new Task("Editing", "Description for Task 7", LocalDate.now().minusDays(20), LocalDate.now().plusDays(12)), new Task("Party", "Description for Task 8", LocalDate.now().minusDays(30), LocalDate.now().plusDays(4)), new Task("Refractoring", "Description for Task 9", LocalDate.now().minusDays(60), LocalDate.now().plusDays(6)), new Task("Fitness planning", "Description for Task 10",LocalDate.now().minusDays(90), LocalDate.now().plusDays(9)) };
         TaskManager taskManager = new TaskManager(tasks);
         taskSearcher = new TaskSearcher(hashTable);
         frame = new JFrame("Task Manager");
@@ -240,7 +240,7 @@ public class TaskManagerGUI {
         int rowCount = tableModel.getRowCount();
         Task[] tasks = new Task[rowCount];
         for (int i = 0; i < rowCount; i++) {
-            tasks[i] = new Task((String) tableModel.getValueAt(i, 0), (String) tableModel.getValueAt(i, 1), LocalDate.now(), (LocalDate) tableModel.getValueAt(i, 3));
+            tasks[i] = new Task((String) tableModel.getValueAt(i, 0), (String) tableModel.getValueAt(i, 1),(LocalDate) tableModel.getValueAt(i, 2), (LocalDate) tableModel.getValueAt(i, 3));
         }
     
         // Sort the tasks using Quick Sort
@@ -250,6 +250,13 @@ public class TaskManagerGUI {
         tableModel.setRowCount(0);
         for (Task task : tasks) {
             tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
+        }
+    }
+    private void quickSort(Task[] tasks, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(tasks, low, high);
+            quickSort(tasks, low, pivotIndex - 1);
+            quickSort(tasks, pivotIndex + 1, high);
         }
     }
     public void sortTasksByDate() {
@@ -355,13 +362,7 @@ public class TaskManagerGUI {
             }
         }
     }
-    private void quickSort(Task[] tasks, int low, int high) {
-        if (low < high) {
-            int pivotIndex = partition(tasks, low, high);
-            quickSort(tasks, low, pivotIndex - 1);
-            quickSort(tasks, pivotIndex + 1, high);
-        }
-    }
+    
 
     private int partition(Task[] tasks, int low, int high) {
         Task pivot = tasks[high];
@@ -385,9 +386,17 @@ public class TaskManagerGUI {
     public void addTask() {
         // Get the name, description, creation date, and due date from the user
         String name = JOptionPane.showInputDialog("Enter the name of the task:");
+        if (name == null || name.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Name is required.");
+            return;
+        }
         String description = JOptionPane.showInputDialog("Enter the description of the task:");
         LocalDate creationDate = LocalDate.now();
         String dueDateInput = JOptionPane.showInputDialog("Enter the due date (MM/dd/yyyy):");
+        if (dueDateInput == null || dueDateInput.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Due date is required.");
+            return;
+        }
         Date dueDate = null;
         try {
             dueDate = formatter.parse(dueDateInput);
@@ -402,17 +411,8 @@ public class TaskManagerGUI {
         // Add the task to the hash table
         hashTable.add(task);
     
-        // Add the task to the TreeSet
-
-    
         // Add the task to the table model
-       // TaskManager.addTask(null, task);
         tableModel.addRow(new Object[]{task.getName(), task.getDescription(), task.getCreationDate(), task.getDueDate(), task.getStatus()});
-        if (task == null) {
-            System.out.println("Task is null");
-        } else {
-            System.out.println("Task is not null");
-        }
     }
     public void removeTask() {
         int[] selectedRows = taskTable.getSelectedRows();
@@ -421,16 +421,16 @@ public class TaskManagerGUI {
         }
     }
     public  void addTasklist() {
-        Task[] tasks = { new Task("Task 1", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)),
-        new Task("Task 2", "Description for Task 2", LocalDate.now(), LocalDate.now().plusDays(3)),
-        new Task("Task 3", "Description for Task 3", LocalDate.now(), LocalDate.now().plusDays(7)),
-        new Task("Task 4", "Description for Task 4", LocalDate.now(), LocalDate.now().plusDays(10)),
-        new Task("Task 5", "Description for Task 5", LocalDate.now(), LocalDate.now().plusDays(2)),
-        new Task("Task 6", "Description for Task 6", LocalDate.now(), LocalDate.now().plusDays(8)),
-        new Task("Task 7", "Description for Task 7", LocalDate.now(), LocalDate.now().plusDays(12)),
-        new Task("Task 8", "Description for Task 8", LocalDate.now(), LocalDate.now().plusDays(4)),
-        new Task("Task 9", "Description for Task 9", LocalDate.now(), LocalDate.now().plusDays(6)),
-        new Task("Task 10", "Description for Task 10", LocalDate.now(), LocalDate.now().plusDays(9)) };
+        Task[] tasks = { new Task("Development", "Description for Task 1", LocalDate.now(), LocalDate.now().plusDays(5)),
+        new Task("Research", "Description for Task 2", LocalDate.now().minusDays(7), LocalDate.now().plusDays(3)),
+        new Task("Draft", "Description for Task 3", LocalDate.now().minusDays(4), LocalDate.now().plusDays(7)),
+        new Task("Proposal", "Description for Task 4", LocalDate.now().minusDays(10), LocalDate.now().plusDays(10)),
+        new Task("Final", "Description for Task 5", LocalDate.now().minusDays(1), LocalDate.now().plusDays(2)),
+        new Task("Walk", "Description for Task 6", LocalDate.now().minusDays(12), LocalDate.now().plusDays(8)),
+        new Task("Editing", "Description for Task 7", LocalDate.now().minusDays(20), LocalDate.now().plusDays(12)),
+        new Task("Party", "Description for Task 8", LocalDate.now().minusDays(30), LocalDate.now().plusDays(4)),
+        new Task("Refractoring", "Description for Task 9", LocalDate.now().minusDays(60), LocalDate.now().plusDays(6)),
+        new Task("Fitness planning", "Description for Task 10", LocalDate.now().minusDays(90), LocalDate.now().plusDays(9)) };
 
 // Add each task to the hash table and the sorted tasks list
 for (Task task : tasks) {
