@@ -84,9 +84,9 @@ public class TaskManagerGUI {
         JButton boyerMooreButton = new JButton("Boyer-Moore Search"); // Add a new button for Boyer-Moore search
         JPanel bottomPanel = new JPanel();
         topPanel.add(searchField);
-        topPanel.add(sortByNameButton);
+        bottomPanel.add(sortByNameButton);
         topPanel.add(sortByDateButton);
-        topPanel.add(sortByPriorityButton);
+       // topPanel.add(sortByPriorityButton);
         topPanel.add(addTaskButton);
         topPanel.add(removeTaskButton);
         topPanel.add(listTaskButton);
@@ -95,7 +95,7 @@ public class TaskManagerGUI {
         bottomPanel.add(boyerMooreButton);
         bottomPanel.add(searchField);
         bottomPanel.add(resultLabel);
-        bottomPanel.add(searchButton);
+       // bottomPanel.add(searchButton);
         bottomPanel.add(TasklistButton);
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(bottomPanel,BorderLayout.SOUTH);
