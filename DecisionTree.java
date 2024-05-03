@@ -31,8 +31,8 @@ public class DecisionTree {
     }
 
     public void adjust(Task task, int predictedPriority) {
-        // This is a simplified example and the actual implementation would be more
-        // complex
+        // Adjust the algorithm
+        // This is for feedback
         if (predictedPriority == 1) {
             // If the predicted priority was too high, lower the threshold
             threshold -= 0.1;
